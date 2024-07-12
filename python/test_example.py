@@ -1,7 +1,6 @@
 import re
 from playwright.sync_api import Page, expect
 
-
 def test_send_inquiry_about_secure_vault(page: Page):
     homepage = Homepage \
         .navigate(page) \
@@ -17,7 +16,6 @@ def test_send_inquiry_about_secure_vault(page: Page):
             phone_number="+351900000000",
             message="I want to know more about..",
         )
-
 
 class Homepage:
     def __init__(self, page: Page):
