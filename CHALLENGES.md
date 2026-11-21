@@ -8,6 +8,7 @@ The example test (`sendInquiries`) already covers the homepage, the cookie banne
 
 - **Opening the site.** The pages open straight from disk. Each language folder already builds the path to `website/`: reuse that, or point your tests at `website/<page>.html`.
 - **Locators.** Use them in the order the Playwright docs recommend: `getByRole`, then `getByLabel`, `getByPlaceholder`, `getByText`, `getByTitle`, and CSS only as a last resort. Every challenge here can be solved without CSS selectors.
+- **Page objects.** Name methods after what the user wants to do (`sendInquiry`, `exploreSecureVault`), not after the clicks they take. One method can click, fill and check several things; the test should read like a user story.
 - **Data.** All data is made up and fixed, so results are the same on every run. Changes you make (deleting files, sharing) live only in the page and reset when it reloads.
 - **Demo account.** The sign-in page accepts one account:
   - Email: `sam.taylor@acmecloud.test`

@@ -27,14 +27,24 @@ The pages use semantic HTML, so every challenge can be solved with the locators 
 
 ## The example test
 
-Each language folder has the same test: it opens the homepage, accepts the cookies, closes the popup in the iframe, picks **SecureVault** from the hover menu, fills in the inquiry form and checks the confirmation. Each one uses the same page objects: `Homepage`, `SecureVault` and an `InquiryForm` component.
+Each language folder has the same test, written in the user's words. The test says what the user wants to do; the page objects know how to do it on the page:
+
+```ts
+const homepage = await Homepage.visit(page)
+const secureVault = await homepage.exploreSecureVault()
+await secureVault.sendInquiry({ firstName: "User", /* ... */ marketingEmails: true })
+await secureVault.confirmsInquiryFrom("User")
+```
+
+Each method is one intention, even when it takes several steps. `visit` opens the site and gets past the cookie banner and the privacy notice in its iframe; `exploreSecureVault` hovers over the menu, picks the product and checks the page; `sendInquiry` opens the form, fills it in, gives consent and submits it. Buttons, iframes and menus stay inside the page objects (`Homepage`, `SecureVault` and the `InquiryForm` component), so the test doesn't change when the page layout does.
 
 | | TypeScript | Kotlin | Python |
 | --- | --- | --- | --- |
 | Test runner | `@playwright/test` | JUnit 5 with `@UsePlaywright` | pytest with the `page` fixture |
 | Async | `await` on every action | synchronous API | synchronous API |
-| Method names | `acceptCookies()` | `` `accept cookies`() ``, with backticks | `accept_cookies()` |
-| Chaining | navigation methods return the next page object; one `await` per line | each method returns the next page object | each method returns the next page object |
+| Method names | `exploreSecureVault()` | `` `explore SecureVault`() ``, with backticks | `explore_secure_vault()` |
+| Chaining | methods that change page return the next page object; one `await` per line | one chain from `visit` to the check | one chain from `visit` to the check |
+| Inquiry data | a `type` | a `data class` | a `@dataclass` |
 
 ## Running the tests
 
@@ -53,7 +63,7 @@ npm run report    # opens the HTML report
 ```sh
 cd kotlin
 gradle playwright --args="install"
-gradle test
+gradle test       # runs in Chromium, Firefox and WebKit (testChromium, testFirefox, testWebkit)
 ```
 
 **Python** (Python 3.12; Playwright 1.65 no longer supports 3.9):
@@ -63,7 +73,7 @@ cd python
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 playwright install
-pytest
+pytest            # runs in Chromium, Firefox and WebKit (see pytest.ini)
 ```
 
 The versions of the tools are in each folder's `.tool-versions`, for those who use `asdf`. The TypeScript tests also run on GitHub Actions on every push.
