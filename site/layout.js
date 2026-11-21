@@ -28,7 +28,7 @@ document.getElementById("site-header").outerHTML = `
     </nav>
   </header>`
 
-// The account links in the header: "Sign in" when signed out, "Files" and "Sign out" when signed in.
+// The account links in the header: "Sign in" when signed out; "Files", "Settings" and "Sign out" when signed in.
 // app.html calls acmeLayout.setSignedIn() when the user signs in or out, and listens for "acme:sign-out".
 const SESSION_KEY = "acme-session"
 
@@ -39,7 +39,7 @@ const acmeLayout = {
       links.innerHTML = navLink("app.html", "Sign in")
       return
     }
-    links.innerHTML = `${navLink("app.html", "Files")}<button type="button" id="nav-sign-out">Sign out</button>`
+    links.innerHTML = `${navLink("app.html", "Files")}<a href="app.html#settings">Settings</a><button type="button" id="nav-sign-out">Sign out</button>`
     document.getElementById("nav-sign-out").addEventListener("click", () => {
       try { localStorage.removeItem(SESSION_KEY) } catch { /* storage may be unavailable */ }
       acmeLayout.setSignedIn(false)

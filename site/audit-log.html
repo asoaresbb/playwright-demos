@@ -80,10 +80,10 @@
 
   <script>
     // A fixed, made-up set of events, so the results are the same on every run
-    const people = ["Inês Duarte", "Tomás Reis", "Clara Moura", "Jonas Berg", "Amélie Moreau", "Piotr Nowak"]
+    const people = ["Sam Taylor", "Jonas Weber", "Priya Shah", "Elena Rossi", "Amélie Moreau", "Piotr Nowak"]
     const actions = ["Viewed", "Viewed", "Downloaded", "Shared", "Viewed", "Revoked", "Viewed", "Downloaded"]
     const fileNames = ["Share purchase agreement – final.pdf", "Board minutes – March.docx", "Payroll export Q1.xlsx", "Audit report 2025.pdf", "NDA – Ostrava Capital.pdf"]
-    const places = ["Lisbon", "Porto", "Oslo", "Paris", "Warsaw", "Zurich"]
+    const places = ["Berlin", "London", "Oslo", "Paris", "Warsaw", "Zurich"]
     const events = Array.from({ length: 42 }, (_, i) => {
       const day = String(31 - Math.floor(i * 0.72)).padStart(2, "0")
       const hour = String(8 + ((i * 5) % 10)).padStart(2, "0")

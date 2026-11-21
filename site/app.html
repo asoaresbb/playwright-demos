@@ -20,10 +20,6 @@
     .files-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 1rem; padding: 3rem 0 1.5rem; }
     .files-head h1 { margin: 0; color: var(--ink); font-size: 2.2rem; letter-spacing: -0.03em; }
     .files-head p { margin: 0.3rem 0 0; color: var(--muted); }
-    .account { position: relative; }
-    .account-menu { position: absolute; right: 0; top: calc(100% + 0.4rem); z-index: 10; min-width: 12rem; margin: 0; padding: 0.4rem; list-style: none; background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: 0 12px 32px -12px rgba(20, 40, 58, 0.35); }
-    .account-menu button { width: 100%; text-align: left; font: inherit; padding: 0.55rem 0.75rem; border: 0; background: none; border-radius: var(--radius-sm); cursor: pointer; color: var(--text); }
-    .account-menu button:hover, .account-menu button:focus-visible { background: var(--surface); }
     .upload input[type="file"] { position: absolute; width: 1px; height: 1px; opacity: 0; }
     .upload label { cursor: pointer; }
     .upload:focus-within label { outline: 3px solid var(--seal); outline-offset: 2px; }
@@ -55,7 +51,7 @@
           </div>
           <span class="field-error" id="password-error"></span>
         </div>
-        <label class="consent"><input type="checkbox" name="remember"> Keep me signed in</label>
+        <label class="consent"><input type="checkbox" name="rememberEmail"> Remember me</label>
         <button type="submit" class="btn">Sign in</button>
       </form>
     </section>
@@ -66,13 +62,6 @@
         <div>
           <h1 id="files-title">Files</h1>
           <p id="files-summary"></p>
-        </div>
-        <div class="account">
-          <button type="button" class="btn btn-secondary" id="account-button" aria-haspopup="menu" aria-expanded="false" aria-controls="account-menu">Inês Duarte</button>
-          <ul class="account-menu" id="account-menu" role="menu" aria-label="Account" hidden>
-            <li role="none"><button type="button" role="menuitem" id="settings">Settings</button></li>
-            <li role="none"><button type="button" role="menuitem" id="sign-out">Sign out</button></li>
-          </ul>
         </div>
       </div>
 
@@ -146,6 +135,32 @@
     </div>
   </dialog>
 
+  <dialog id="settings-dialog" aria-labelledby="settings-title">
+    <form method="dialog" id="settings-form" novalidate>
+      <div class="dialog-body">
+        <h2 id="settings-title">Settings</h2>
+        <div class="dialog-form">
+          <label class="field">Display name
+            <input type="text" name="displayName" autocomplete="name">
+            <span class="field-error" id="display-name-error"></span>
+          </label>
+          <label class="field">Language
+            <select name="language">
+              <option selected>English</option>
+              <option>Deutsch</option>
+              <option>Français</option>
+            </select>
+          </label>
+          <label class="consent"><input type="checkbox" name="openAlerts" checked> Notify me when someone opens a file I shared</label>
+        </div>
+      </div>
+      <div class="dialog-actions">
+        <button type="button" class="btn btn-secondary" id="cancel-settings">Cancel</button>
+        <button type="submit" class="btn">Save settings</button>
+      </div>
+    </form>
+  </dialog>
+
   <p class="toast" role="status" id="toast"></p>
 
   <div id="site-footer"></div>
@@ -153,9 +168,10 @@
 
   <script>
     // Demo account of the fictional workspace (see CHALLENGES.md)
-    const DEMO_EMAIL = "ines.duarte@acmecloud.test"
-    const DEMO_PASSWORD = "vault-demo-2024"
+    const DEMO_EMAIL = "sam.taylor@acmecloud.test"
+    const DEMO_PASSWORD = "open-the-vault"
     // SESSION_KEY and acmeLayout come from layout.js
+    const EMAIL_KEY = "acme-remembered-email"
     const MAX_ATTEMPTS = 3
     const LOCK_SECONDS = 30
 
@@ -190,14 +206,21 @@
       document.title = "Files – Acme Cloud"
       acmeLayout.setSignedIn(true)
       renderFiles()
+      openSettingsFromHash()
     }
     const showSignIn = () => {
       $("files-view").hidden = true
       $("signin-view").hidden = false
       document.title = "Sign in – Acme Cloud"
       acmeLayout.setSignedIn(false)
+      // Fill in the email address if "Remember me" was ticked last time
+      let rememberedEmail = null
+      try { rememberedEmail = localStorage.getItem(EMAIL_KEY) } catch { /* storage may be unavailable */ }
+      const form = $("signin-form")
+      form.elements.email.value = rememberedEmail ?? ""
+      form.elements.rememberEmail.checked = rememberedEmail !== null
     }
-    // Signing out from the account menu or from "Sign out" in the header
+    // Signing out from "Sign out" in the header
     const signOut = () => {
       try { localStorage.removeItem(SESSION_KEY) } catch { /* storage may be unavailable */ }
       files = initialFiles.map((file) => ({ ...file }))
@@ -256,28 +279,42 @@
       }
 
       failedAttempts = 0
+      // The session always lasts until "Sign out"; the email is kept only if the box is ticked
       try {
-        if (form.elements.remember.checked) localStorage.setItem(SESSION_KEY, DEMO_EMAIL)
+        localStorage.setItem(SESSION_KEY, DEMO_EMAIL)
+        if (form.elements.rememberEmail.checked) localStorage.setItem(EMAIL_KEY, email)
+        else localStorage.removeItem(EMAIL_KEY)
       } catch { /* storage may be unavailable */ }
       form.reset()
       showFiles()
     })
 
-    // ---------- Account menu ----------
+    // ---------- Settings dialog ----------
 
-    const accountButton = $("account-button")
-    const accountMenu = $("account-menu")
-    const setMenu = (open) => {
-      accountMenu.hidden = !open
-      accountButton.setAttribute("aria-expanded", String(open))
-      if (open) accountMenu.querySelector('[role="menuitem"]').focus()
+    // Opened from "Settings" in the header, which links to app.html#settings
+    let displayName = "Sam Taylor"
+    const settingsDialog = $("settings-dialog")
+    const openSettingsFromHash = () => {
+      if (location.hash !== "#settings" || $("files-view").hidden || settingsDialog.open) return
+      const form = $("settings-form")
+      form.elements.displayName.value = displayName
+      $("display-name-error").textContent = ""
+      settingsDialog.showModal()
     }
-    accountButton.addEventListener("click", () => setMenu(accountMenu.hidden))
-    accountMenu.addEventListener("keydown", (event) => { if (event.key === "Escape") { setMenu(false); accountButton.focus() } })
-    $("settings").addEventListener("click", () => { setMenu(false); showToast("Settings are not available in the demo.") })
-    $("sign-out").addEventListener("click", () => {
-      setMenu(false)
-      signOut()
+    window.addEventListener("hashchange", openSettingsFromHash)
+    settingsDialog.addEventListener("close", () => history.replaceState(null, "", location.pathname))
+    $("cancel-settings").addEventListener("click", () => settingsDialog.close())
+    $("settings-form").addEventListener("submit", (event) => {
+      const form = event.target
+      const name = form.elements.displayName.value.trim()
+      if (!name) {
+        event.preventDefault()
+        $("display-name-error").textContent = "Enter the name to show to people you share files with."
+        return
+      }
+      displayName = name
+      renderFiles()
+      showToast("Settings saved.")
     })
 
     // ---------- Files table ----------
@@ -325,7 +362,7 @@
         tbody.append(row)
       }
 
-      $("files-summary").textContent = `${files.length} files in your workspace`
+      $("files-summary").textContent = `Signed in as ${displayName}. ${files.length} files in your workspace.`
       const empty = $("files-empty")
       empty.hidden = list.length > 0
       empty.textContent = files.length === 0
@@ -431,9 +468,9 @@
     })
 
     // Restore the session last, once everything above is defined
-    let remembered = false
-    try { remembered = localStorage.getItem(SESSION_KEY) === DEMO_EMAIL } catch { /* storage may be unavailable */ }
-    if (remembered) showFiles()
+    let signedIn = false
+    try { signedIn = localStorage.getItem(SESSION_KEY) === DEMO_EMAIL } catch { /* storage may be unavailable */ }
+    signedIn ? showFiles() : showSignIn()
   </script>
 </body>
 </html>

@@ -10,8 +10,8 @@ The example test (`sendInquiries`) already covers the homepage, the cookie banne
 - **Locators.** Use them in the order the Playwright docs recommend: `getByRole`, then `getByLabel`, `getByPlaceholder`, `getByText`, `getByTitle`, and CSS only as a last resort. Every challenge here can be solved without CSS selectors.
 - **Data.** All data is made up and fixed, so results are the same on every run. Changes you make (deleting files, sharing) live only in the page and reset when it reloads.
 - **Demo account.** The sign-in page accepts one account:
-  - Email: `ines.duarte@acmecloud.test`
-  - Password: `vault-demo-2024`
+  - Email: `sam.taylor@acmecloud.test`
+  - Password: `open-the-vault`
 
 Levels: **B** beginner, **I** intermediate, **A** advanced.
 
@@ -45,7 +45,8 @@ Levels: **B** beginner, **I** intermediate, **A** advanced.
 | B | Sign in with the demo account and check the "Files" heading and the page title. | A full login flow |
 | I | Get the password wrong three times and check the form locks and counts down. | Timers; try `page.clock` to skip the 30 seconds |
 | I | Click "Show" and check the password becomes readable text. | Attributes and `aria-pressed` |
-| A | Sign in once with "Keep me signed in", save the storage state, and reuse it in other tests so they start signed in. | `storageState`, test fixtures |
+| A | Sign in once, save the storage state, and reuse it in other tests so they start signed in. | `storageState`, test fixtures |
+| I | Tick "Remember me", sign in and sign out: check the email is filled in and the box is ticked. Then untick it, sign in and out again, and check the email is gone. | `toHaveValue`, `toBeChecked` |
 | I | Sort by size, largest first, and check the first row. | Sortable headers with `aria-sort` |
 | I | Filter by "pdf" and check how many rows remain. | Counting rows |
 | I | Share "Board minutes – March.docx" with someone for 30 days, with downloads allowed. Check the toast and the new "Shared with" count. | Dialog forms, toasts |
@@ -54,8 +55,8 @@ Levels: **B** beginner, **I** intermediate, **A** advanced.
 | A | Select two files and use "Delete selected". It asks with the browser's own `confirm()`: accept it once and dismiss it once. | `page.on("dialog")`, `accept` and `dismiss` |
 | I | Use "Select all", then untick one file, and check the "Select all" box shows as mixed. | Indeterminate checkboxes |
 | A | Upload two files at once and check both appear with their sizes. | `setInputFiles` with in-memory files |
-| I | Open the account menu, check it with the keyboard (Escape closes it), and sign out. | `role="menu"`, focus |
-| B | After signing in, check the header shows "Files" and "Sign out" instead of "Sign in". Sign out from the header and check it changes back. | Scoping to the `navigation` landmark |
+| I | Open "Settings" from the header, change the display name and save. Check the toast and that the page shows the new name. Then open it again and try to save an empty name. | Dialogs opened from a URL hash, validation |
+| B | After signing in, check the header shows "Files", "Settings" and "Sign out" instead of "Sign in". Sign out from the header and check it changes back. | Scoping to the `navigation` landmark |
 
 ## Audit Log (`audit-log.html`)
 

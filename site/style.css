@@ -328,3 +328,7 @@ main.wrap:has(> .page-head), #files-view { padding-bottom: 4rem; }
 .account-links { display: flex; align-items: center; gap: 1.25rem; }
 .account-links button { font: inherit; font-size: 0.97rem; color: var(--text); background: none; border: 0; padding: 0; cursor: pointer; }
 .account-links button:hover { color: var(--seal-dark); }
+
+/* Keep the footer at the bottom on short pages */
+body { min-height: 100vh; display: flex; flex-direction: column; }
+body > main { flex: 1 0 auto; width: 100%; }
