@@ -24,6 +24,11 @@ python/        pytest-playwright, in a single file
 
 Each language uses the same page objects: `Homepage`, `SecureVault` and an `InquiryForm` component.
 
+## Practising
+
+The site has more pages than the example test uses: pricing, customers, a sign-in page with a file list, an audit log and legal pages. They are built around common testing situations, such as filters, sortable tables, dialogs, delayed loading, downloads and a login. [`CHALLENGES.md`](CHALLENGES.md) lists exercises for each page, by level, to write in any of the three languages.
+
+
 ## What differs between the languages
 
 | | TypeScript | Kotlin | Python |
