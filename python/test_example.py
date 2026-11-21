@@ -3,8 +3,8 @@ from pathlib import Path
 
 from playwright.sync_api import Page, expect
 
-# The fictional site in ../site, opened straight from disk
-HOMEPAGE_URL = (Path(__file__).parent.parent / "site" / "index.html").resolve().as_uri()
+# The fictional site in ../website, opened straight from disk
+HOMEPAGE_URL = (Path(__file__).parent.parent / "website" / "index.html").resolve().as_uri()
 
 
 def test_send_inquiry_about_secure_vault(page: Page):

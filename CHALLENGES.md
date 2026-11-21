@@ -1,12 +1,12 @@
 # Practice challenges
 
-The fictional Acme Cloud site in [`site/`](site/) has more pages than the example test uses. Each one is built around patterns you meet when testing real web apps. Pick a language folder, add a page object or two, and write tests for the challenges below.
+The fictional Acme Cloud site in [`website/`](website/) has more pages than the example test uses. Each one is built around patterns you meet when testing real web apps. Pick a language folder, add a page object or two, and write tests for the challenges below.
 
 The example test (`sendInquiries`) already covers the homepage, the cookie banner, the popup in an iframe, the hover menu and the inquiry form. Use it as a model.
 
 ## Before you start
 
-- **Opening the site.** The pages open straight from disk. Each language folder already builds the path to `site/`: reuse that, or point your tests at `site/<page>.html`.
+- **Opening the site.** The pages open straight from disk. Each language folder already builds the path to `website/`: reuse that, or point your tests at `website/<page>.html`.
 - **Locators.** Use them in the order the Playwright docs recommend: `getByRole`, then `getByLabel`, `getByPlaceholder`, `getByText`, `getByTitle`, and CSS only as a last resort. Every challenge here can be solved without CSS selectors.
 - **Data.** All data is made up and fixed, so results are the same on every run. Changes you make (deleting files, sharing) live only in the page and reset when it reloads.
 - **Demo account.** The sign-in page accepts one account:

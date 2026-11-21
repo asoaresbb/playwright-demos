@@ -30,8 +30,8 @@ class Homepage(private val page: Page) {
     }
 
     companion object {
-        // The fictional site in ../site, opened straight from disk (Gradle runs the tests from kotlin/)
-        private val homepageUrl = Paths.get("..", "site", "index.html").toAbsolutePath().normalize().toUri().toString()
+        // The fictional site in ../website, opened straight from disk (Gradle runs the tests from kotlin/)
+        private val homepageUrl = Paths.get("..", "website", "index.html").toAbsolutePath().normalize().toUri().toString()
 
         fun navigate(page: Page): Homepage {
             page.navigate(homepageUrl)

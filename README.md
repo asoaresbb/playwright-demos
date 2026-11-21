@@ -4,7 +4,7 @@ The same end-to-end test written with Playwright in three languages, TypeScript,
 
 ## What the test does
 
-The tests run against a fictional company site in [`site/`](site/), opened straight from disk, so they need no server or internet connection and send nothing anywhere. The test:
+The tests run against a fictional company site in [`website/`](website/), opened straight from disk, so they need no server or internet connection and send nothing anywhere. The test:
 
 1. opens the homepage and checks its title;
 2. accepts the cookie banner;
@@ -16,10 +16,10 @@ The tests run against a fictional company site in [`site/`](site/), opened strai
 ## Structure
 
 ```
-site/          the fictional site the tests run against
 typescript/    @playwright/test, with pages and a form component
 kotlin/        Playwright for Java with JUnit 5, built with Gradle
 python/        pytest-playwright, in a single file
+website/       the fictional site the tests run against
 ```
 
 Each language uses the same page objects: `Homepage`, `SecureVault` and an `InquiryForm` component.

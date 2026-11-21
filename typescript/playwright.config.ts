@@ -26,8 +26,8 @@ export default defineConfig({
   reporter: 'html',
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
-    /* The fictional site in ../site, opened straight from disk: `page.goto('index.html')` */
-    baseURL: pathToFileURL(path.join(__dirname, '..', 'site') + path.sep).href,
+    /* The fictional site in ../website, opened straight from disk: `page.goto('index.html')` */
+    baseURL: pathToFileURL(path.join(__dirname, '..', 'website') + path.sep).href,
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
