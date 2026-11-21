@@ -1,28 +1,16 @@
 import { expect, Page } from "@playwright/test"
-import { InquiryForm } from "../components/inquiryForm.ts"
+import { Inquiry, InquiryForm } from "../components/inquiryForm"
 
 export class SecureVault {
-  inquiryForm: InquiryForm
+  constructor(private page: Page) {}
 
-  constructor(private page: Page) {
-    this.inquiryForm = new InquiryForm(this.page)
-  }
-
-  async goToInquiryForm() {
+  // Opens the inquiry form, fills it in, gives consent and sends it
+  async sendInquiry(inquiry: Inquiry) {
     await this.page.getByRole("link", { name: "Send inquiry" }).click()
+    await new InquiryForm(this.page).submit(inquiry)
   }
 
-  async fillInquiryForm(inquiryData: {
-    firstName: string
-    lastName: string
-    email: string
-    phoneNumber: string
-    message: string
-  }) {
-    await this.inquiryForm.fillInquiryForm(inquiryData)
-  }
-
-  async expectConfirmation(firstName: string) {
+  async confirmsInquiryFrom(firstName: string) {
     await expect(this.page.getByRole("status")).toHaveText(
       `Thank you, ${firstName}. We will get back to you soon.`
     )

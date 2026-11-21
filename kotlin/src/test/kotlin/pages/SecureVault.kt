@@ -5,35 +5,20 @@ import com.microsoft.playwright.Page.GetByRoleOptions
 import com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat
 import com.microsoft.playwright.options.AriaRole.LINK
 import com.microsoft.playwright.options.AriaRole.STATUS
+import components.Inquiry
 import components.InquiryForm
 
 class SecureVault(private val page: Page) {
 
-    fun `go to inquiry form`(): SecureVault {
+    // Opens the inquiry form, fills it in, gives consent and sends it
+    fun `send inquiry`(inquiry: Inquiry): SecureVault {
         page.getByRole(LINK, GetByRoleOptions().setName("Send inquiry")).click()
+        InquiryForm(page).submit(inquiry)
         return this
     }
 
-    fun `submit inquiry form`(
-        firstName: String,
-        lastName: String,
-        email: String,
-        phoneNumber: String,
-        message: String
-    ): SecureVault {
-        InquiryForm(page).invoke(
-            firstName = firstName,
-            lastName = lastName,
-            email = email,
-            phoneNumber = phoneNumber,
-            message = message,
-        )
-        return this
-    }
-
-    fun `expect confirmation`(firstName: String): SecureVault {
+    fun `confirms inquiry from`(firstName: String): SecureVault {
         assertThat(page.getByRole(STATUS)).hasText("Thank you, $firstName. We will get back to you soon.")
         return this
     }
 }
-
