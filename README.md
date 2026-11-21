@@ -1,35 +1,33 @@
 # playwright-polyglot-pom
 
-The same end-to-end test written with Playwright in three languages, TypeScript, Kotlin and Python, to compare the syntax and how each one organises the Page Object Model.
+Two things in one repository:
 
-## What the test does
+- **The same end-to-end test in three languages**, TypeScript, Kotlin and Python, written with Playwright and the Page Object Model, to compare how each language reads.
+- **A practice website** for a fictional company, Acme Cloud, with pages built around the situations you meet when testing real web apps, and [a list of challenges](CHALLENGES.md) to solve in any language.
 
-The tests run against a fictional company site in [`website/`](website/), opened straight from disk, so they need no server or internet connection and send nothing anywhere. The test:
+The website opens straight from disk: no server, no internet connection, and nothing is sent anywhere.
 
-1. opens the homepage and checks its title;
-2. accepts the cookie banner;
-3. closes a privacy popup that lives inside an iframe;
-4. hovers over the **Solutions** menu and picks the **SecureVault** product;
-5. opens the inquiry form, fills in every field and both consent checkboxes, and submits it;
-6. checks the confirmation message.
+## The practice website
 
-## Structure
+Open `website/index.html` in a browser to look around. Each page exercises different Playwright features:
 
-```
-typescript/    @playwright/test, with pages and a form component
-kotlin/        Playwright for Java with JUnit 5, built with Gradle
-python/        pytest-playwright, in a single file
-website/       the fictional site the tests run against
-```
+| Page | What's on it |
+| --- | --- |
+| Home (`index.html`) | Cookie banner, a popup inside an iframe, a menu that opens on hover |
+| SecureVault (`securevault.html`) | Product page with an inquiry form and a confirmation message |
+| Pricing (`pricing.html`) | Monthly/yearly switch, a cost calculator with validation, a comparison table, questions that expand |
+| Customers (`customers.html`) | Search, filters, "Load more" with a delay, stories in a modal dialog, an empty state |
+| Sign in (`app.html`) | Login with validation and a lockout after three attempts, then a file list: sorting, filtering, selecting, sharing, deleting (with a dialog and with the browser's `confirm()`), uploading, settings |
+| Audit Log (`audit-log.html`) | Events that load after a delay, filters, pagination, CSV export |
+| Legal (`legal.html`) | Accessible tabs, with the URL hash picking the tab |
 
-Each language uses the same page objects: `Homepage`, `SecureVault` and an `InquiryForm` component.
+The pages use semantic HTML, so every challenge can be solved with the locators Playwright recommends (`getByRole`, `getByLabel`, `getByPlaceholder` and so on), without CSS selectors. The data is made up and fixed, so results are the same on every run.
 
-## Practising
+[`CHALLENGES.md`](CHALLENGES.md) has about 40 exercises by page and level, and the demo account for the sign-in page.
 
-The site has more pages than the example test uses: pricing, customers, a sign-in page with a file list, an audit log and legal pages. They are built around common testing situations, such as filters, sortable tables, dialogs, delayed loading, downloads and a login. [`CHALLENGES.md`](CHALLENGES.md) lists exercises for each page, by level, to write in any of the three languages.
+## The example test
 
-
-## What differs between the languages
+Each language folder has the same test: it opens the homepage, accepts the cookies, closes the popup in the iframe, picks **SecureVault** from the hover menu, fills in the inquiry form and checks the confirmation. Each one uses the same page objects: `Homepage`, `SecureVault` and an `InquiryForm` component.
 
 | | TypeScript | Kotlin | Python |
 | --- | --- | --- | --- |
@@ -38,7 +36,7 @@ The site has more pages than the example test uses: pricing, customers, a sign-i
 | Method names | `acceptCookies()` | `` `accept cookies`() ``, with backticks | `accept_cookies()` |
 | Chaining | navigation methods return the next page object; one `await` per line | each method returns the next page object | each method returns the next page object |
 
-## Running
+## Running the tests
 
 **TypeScript** (Node.js):
 
@@ -68,8 +66,18 @@ playwright install
 pytest
 ```
 
-The versions of the tools are in each folder's `.tool-versions`, for those who use `asdf`.
+The versions of the tools are in each folder's `.tool-versions`, for those who use `asdf`. The TypeScript tests also run on GitHub Actions on every push.
+
+## Structure
+
+```
+typescript/       the example test with @playwright/test
+kotlin/           the example test with Playwright for Java and JUnit 5
+python/           the example test with pytest-playwright
+website/          the practice website
+CHALLENGES.md     exercises for the practice website
+```
 
 ## Context
 
-Personal project, July 2024, built through pair programming with a mentor.
+Personal project. The example test was written in July 2024 through pair programming with a mentor; the practice website and the challenges were added in November 2026.
