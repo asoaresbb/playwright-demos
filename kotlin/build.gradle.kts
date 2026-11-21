@@ -11,7 +11,7 @@ repositories {
 
 dependencies {
     testImplementation(kotlin("test"))
-    testImplementation("com.microsoft.playwright:playwright:1.45.0")
+    testImplementation("com.microsoft.playwright:playwright:1.65.1")
 }
 
 tasks.test {

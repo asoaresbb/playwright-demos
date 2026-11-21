@@ -1,0 +1,2 @@
+playwright==1.65.1
+pytest-playwright==0.10.0
