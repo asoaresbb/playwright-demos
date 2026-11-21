@@ -1,41 +1,111 @@
 <!doctype html>
-<!-- Fictional company site used as the target of the tests. Nothing here is sent anywhere. -->
+<!-- Acme Cloud is a fictional company, made up as the target of the tests. Nothing here is sent anywhere. -->
 <html lang="en">
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Acme Cloud – Simple and secure file sharing</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header>
-    <nav aria-label="Main">
-      <a href="index.html" class="logo">Acme Cloud</a>
-      <div class="menu">
-        <button type="button">Solutions</button>
-        <ul class="submenu">
-          <li><a href="securevault.html">SecureVault</a></li>
-        </ul>
+  <header class="site-header">
+    <nav aria-label="Main" class="wrap">
+      <a href="index.html" class="logo"><span class="logo-mark" aria-hidden="true"></span>Acme Cloud</a>
+      <div class="nav-links">
+        <div class="menu">
+          <button type="button" aria-haspopup="true">Solutions</button>
+          <ul class="submenu">
+            <li><a href="securevault.html">SecureVault<small>Encrypted rooms for contracts and board papers</small></a></li>
+            <li><a href="securevault.html">Audit Log<small>See who opened what, and when</small></a></li>
+          </ul>
+        </div>
+        <a href="#">Pricing</a>
+        <a href="#">Customers</a>
+      </div>
+      <div class="nav-actions">
+        <a href="#">Sign in</a>
+        <a href="securevault.html#inquiry" class="button-link">Book a demo</a>
       </div>
     </nav>
   </header>
 
-  <main>
-    <h1>Simple and secure file sharing</h1>
-    <p>Acme Cloud is a fictional company, made up for these tests.</p>
+  <main class="wrap">
+    <section class="hero">
+      <div>
+        <h1>Send sensitive files without losing track of them.</h1>
+        <p>Share contracts, payroll and due diligence documents with people outside your company. Every file is encrypted, every open is logged, and access ends when you say so.</p>
+        <div class="hero-actions">
+          <a href="securevault.html" class="button-link">Explore SecureVault</a>
+          <a href="#" class="button-link secondary">View pricing</a>
+        </div>
+      </div>
+
+      <figure class="receipt" aria-label="Example of a shared file and its access log">
+        <div class="receipt-head">
+          <span class="file-icon" aria-hidden="true"></span>
+          <div>
+            <strong>Share purchase agreement – final.pdf</strong>
+            <span>Shared by Inês Duarte with 2 people</span>
+          </div>
+        </div>
+        <div class="receipt-meta">
+          <div><b>Encrypted</b>AES-256</div>
+          <div><b>Expires</b>in 7 days</div>
+          <div><b>Downloads</b>Disabled</div>
+        </div>
+        <ol class="audit">
+          <li class="done"><span>Link sent to Tomás Reis</span><time>09:12</time></li>
+          <li class="done"><span>Opened by Tomás Reis in Lisbon</span><time>09:41</time></li>
+          <li class="done"><span>Viewed pages 1 to 14</span><time>09:58</time></li>
+          <li><span>Waiting for Clara Moura</span><time>pending</time></li>
+        </ol>
+      </figure>
+    </section>
+
+    <dl class="facts">
+      <div><dt>Encrypted before it leaves your laptop</dt><dd>Files are encrypted on your device. We store them, but we can't read them.</dd></div>
+      <div><dt>An answer to "who saw this?"</dt><dd>Each view, download and forward is recorded, ready to export for an audit.</dd></div>
+      <div><dt>Hosted in the EU</dt><dd>Data stays in data centres in Frankfurt and Zurich, under GDPR.</dd></div>
+    </dl>
+
+    <section class="customers">
+      <p>Used by legal, finance and HR teams at</p>
+      <ul>
+        <li>Halden Legal</li>
+        <li>Morrow &amp; Pike</li>
+        <li>Northfield Health</li>
+        <li>Ostrava Capital</li>
+        <li>Brightwater Foods</li>
+      </ul>
+    </section>
   </main>
 
+  <footer class="site-footer">
+    <div class="wrap">
+      <p>© Acme Cloud. A fictional company, made up as the target of these tests.</p>
+      <p>Privacy · Terms · Security</p>
+    </div>
+  </footer>
+
   <div class="cookie-banner" role="dialog" aria-label="Cookies">
-    <p>We use cookies to improve your experience.</p>
-    <button type="button" id="accept-cookies">Accept</button>
+    <p>We use cookies to keep you signed in and to understand how the site is used.</p>
+    <div class="cookie-actions">
+      <button type="button" id="accept-cookies">Accept</button>
+      <button type="button" id="reject-cookies">Only essential</button>
+    </div>
   </div>
 
   <!-- A popup inside an iframe, so the tests have to switch into a frame to close it -->
   <iframe src="popup.html" title="Popup CTA" class="popup"></iframe>
 
   <script>
-    document.getElementById("accept-cookies").addEventListener("click", () => {
-      document.querySelector(".cookie-banner").remove()
-    })
+    for (const id of ["accept-cookies", "reject-cookies"]) {
+      document.getElementById(id).addEventListener("click", () => {
+        document.querySelector(".cookie-banner").remove()
+      })
+    }
     // The popup page asks to be closed with postMessage (works across origins, including file://)
     window.addEventListener("message", (event) => {
       if (event.data === "close-popup") document.querySelector(".popup").remove()

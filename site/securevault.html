@@ -2,38 +2,94 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>SecureVault</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <main>
-    <h1>SecureVault</h1>
-    <p>Store and share documents with end-to-end encryption.</p>
-    <a href="#inquiry">Send inquiry</a>
+  <header class="site-header">
+    <nav aria-label="Main" class="wrap">
+      <a href="index.html" class="logo"><span class="logo-mark" aria-hidden="true"></span>Acme Cloud</a>
+      <div class="nav-links">
+        <div class="menu">
+          <button type="button" aria-haspopup="true">Solutions</button>
+          <ul class="submenu">
+            <li><a href="securevault.html">SecureVault<small>Encrypted rooms for contracts and board papers</small></a></li>
+            <li><a href="securevault.html">Audit Log<small>See who opened what, and when</small></a></li>
+          </ul>
+        </div>
+        <a href="#">Pricing</a>
+        <a href="#">Customers</a>
+      </div>
+      <div class="nav-actions">
+        <a href="#">Sign in</a>
+      </div>
+    </nav>
+  </header>
 
-    <form id="inquiry">
-      <h2>Send us an inquiry</h2>
-      <label>First name <input type="text" name="firstName" required></label>
-      <label>Last name <input type="text" name="lastName" required></label>
-      <label>Email <input type="text" name="email" required></label>
-      <label>Phone number <input type="text" name="phoneNumber"></label>
-      <label>Message <textarea name="message"></textarea></label>
-      <label><input type="checkbox" name="marketing"> I agree to receive marketing communications from Acme Cloud</label>
-      <label><input type="checkbox" name="privacy" required> I agree to allow Acme Cloud to store and process my personal data</label>
-      <button type="submit">Submit</button>
-    </form>
+  <main class="wrap">
+    <section class="product-hero">
+      <p class="crumb"><a href="index.html">Solutions</a> / SecureVault</p>
+      <h1>SecureVault</h1>
+      <p>A shared room for the documents you can't send by email. Invite people from outside your company, decide what they can do with each file, and close the room when the deal is done.</p>
+      <a href="#inquiry" class="button-link">Send inquiry</a>
+    </section>
 
-    <p role="status" id="confirmation"></p>
+    <ul class="features">
+      <li><b>Permissions per file</b><span>View only, download, or print, set separately for each person.</span></li>
+      <li><b>Watermarks with the viewer's name</b><span>Every page shows who opened it, so screenshots carry a name.</span></li>
+      <li><b>Access that expires</b><span>Pick an end date for the room, or revoke one person at any time.</span></li>
+      <li><b>Retention rules</b><span>Keep files for as long as your policy says, then delete them automatically.</span></li>
+    </ul>
+
+    <section class="contact" id="inquiry">
+      <div class="contact-intro">
+        <h2>Talk to our team</h2>
+        <p>Tell us what you need to share and with whom. We'll set up a trial room with your own documents.</p>
+        <ol class="next-steps">
+          <li>We reply within one business day.</li>
+          <li>A 30-minute call to understand your setup.</li>
+          <li>A trial room, free for 30 days.</li>
+        </ol>
+      </div>
+
+      <form id="inquiry-form" novalidate>
+        <label class="field">First name <input type="text" name="firstName" autocomplete="given-name" required></label>
+        <label class="field">Last name <input type="text" name="lastName" autocomplete="family-name" required></label>
+        <label class="field full">Work email <input type="text" name="email" autocomplete="email" required></label>
+        <label class="field full">Phone number <input type="text" name="phoneNumber" autocomplete="tel"></label>
+        <label class="field full">Message <textarea name="message"></textarea></label>
+        <label class="consent full"><input type="checkbox" name="marketing"> I agree to receive marketing communications from Acme Cloud</label>
+        <label class="consent full"><input type="checkbox" name="privacy" required> I agree to allow Acme Cloud to store and process my personal data</label>
+        <button type="submit" class="full">Submit inquiry</button>
+      </form>
+
+      <p role="status" id="confirmation" class="confirmation"></p>
+    </section>
   </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p>© Acme Cloud. A fictional company, made up as the target of these tests.</p>
+      <p>Privacy · Terms · Security</p>
+    </div>
+  </footer>
 
   <script>
     // Nothing is sent: the form only shows a confirmation, which the tests check
-    document.getElementById("inquiry").addEventListener("submit", (event) => {
+    const form = document.getElementById("inquiry-form")
+    form.addEventListener("submit", (event) => {
       event.preventDefault()
-      const firstName = event.target.elements.firstName.value
+      if (!form.checkValidity()) {
+        form.reportValidity()
+        return
+      }
+      const firstName = form.elements.firstName.value
       document.getElementById("confirmation").textContent =
         `Thank you, ${firstName}. We will get back to you soon.`
-      event.target.hidden = true
+      form.hidden = true
     })
   </script>
 </body>

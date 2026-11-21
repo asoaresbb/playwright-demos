@@ -2,15 +2,20 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Privacy policy</title>
+  <title>Privacy policy update</title>
+  <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body class="popup-body">
-  <p>We updated our privacy policy.</p>
+  <h2>We updated our privacy policy</h2>
+  <p>We now list every subprocessor we use and where it stores data. Nothing changes in how we handle your files.</p>
   <div class="button-container" role="button" tabindex="0">Got it</div>
   <script>
-    document.querySelector(".button-container").addEventListener("click", () => {
-      window.parent.postMessage("close-popup", "*")
+    const close = () => window.parent.postMessage("close-popup", "*")
+    const button = document.querySelector(".button-container")
+    button.addEventListener("click", close)
+    button.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") close()
     })
   </script>
 </body>
