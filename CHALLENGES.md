@@ -55,6 +55,7 @@ Levels: **B** beginner, **I** intermediate, **A** advanced.
 | I | Use "Select all", then untick one file, and check the "Select all" box shows as mixed. | Indeterminate checkboxes |
 | A | Upload two files at once and check both appear with their sizes. | `setInputFiles` with in-memory files |
 | I | Open the account menu, check it with the keyboard (Escape closes it), and sign out. | `role="menu"`, focus |
+| B | After signing in, check the header shows "Files" and "Sign out" instead of "Sign in". Sign out from the header and check it changes back. | Scoping to the `navigation` landmark |
 
 ## Audit Log (`audit-log.html`)
 

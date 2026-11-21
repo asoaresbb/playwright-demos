@@ -155,7 +155,7 @@
     // Demo account of the fictional workspace (see CHALLENGES.md)
     const DEMO_EMAIL = "ines.duarte@acmecloud.test"
     const DEMO_PASSWORD = "vault-demo-2024"
-    const SESSION_KEY = "acme-session"
+    // SESSION_KEY and acmeLayout come from layout.js
     const MAX_ATTEMPTS = 3
     const LOCK_SECONDS = 30
 
@@ -188,13 +188,24 @@
       $("signin-view").hidden = true
       $("files-view").hidden = false
       document.title = "Files – Acme Cloud"
+      acmeLayout.setSignedIn(true)
       renderFiles()
     }
     const showSignIn = () => {
       $("files-view").hidden = true
       $("signin-view").hidden = false
       document.title = "Sign in – Acme Cloud"
+      acmeLayout.setSignedIn(false)
     }
+    // Signing out from the account menu or from "Sign out" in the header
+    const signOut = () => {
+      try { localStorage.removeItem(SESSION_KEY) } catch { /* storage may be unavailable */ }
+      files = initialFiles.map((file) => ({ ...file }))
+      selected.clear()
+      showSignIn()
+      showToast("You signed out.")
+    }
+    document.addEventListener("acme:sign-out", signOut)
 
     $("toggle-password").addEventListener("click", (event) => {
       const input = $("password")
@@ -266,11 +277,7 @@
     $("settings").addEventListener("click", () => { setMenu(false); showToast("Settings are not available in the demo.") })
     $("sign-out").addEventListener("click", () => {
       setMenu(false)
-      try { localStorage.removeItem(SESSION_KEY) } catch { /* ignore */ }
-      files = initialFiles.map((file) => ({ ...file }))
-      selected.clear()
-      showSignIn()
-      showToast("You signed out.")
+      signOut()
     })
 
     // ---------- Files table ----------

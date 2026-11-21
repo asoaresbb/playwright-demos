@@ -22,11 +22,35 @@ document.getElementById("site-header").outerHTML = `
         ${navLink("customers.html", "Customers")}
       </div>
       <div class="nav-actions">
-        ${navLink("app.html", "Sign in")}
+        <span class="account-links" id="account-links"></span>
         <a href="securevault.html#inquiry" class="button-link">Book a demo</a>
       </div>
     </nav>
   </header>`
+
+// The account links in the header: "Sign in" when signed out, "Files" and "Sign out" when signed in.
+// app.html calls acmeLayout.setSignedIn() when the user signs in or out, and listens for "acme:sign-out".
+const SESSION_KEY = "acme-session"
+
+const acmeLayout = {
+  setSignedIn(signedIn) {
+    const links = document.getElementById("account-links")
+    if (!signedIn) {
+      links.innerHTML = navLink("app.html", "Sign in")
+      return
+    }
+    links.innerHTML = `${navLink("app.html", "Files")}<button type="button" id="nav-sign-out">Sign out</button>`
+    document.getElementById("nav-sign-out").addEventListener("click", () => {
+      try { localStorage.removeItem(SESSION_KEY) } catch { /* storage may be unavailable */ }
+      acmeLayout.setSignedIn(false)
+      document.dispatchEvent(new Event("acme:sign-out"))
+    })
+  },
+}
+
+let rememberedSession = false
+try { rememberedSession = localStorage.getItem(SESSION_KEY) !== null } catch { /* storage may be unavailable */ }
+acmeLayout.setSignedIn(rememberedSession)
 
 document.getElementById("site-footer").outerHTML = `
   <footer class="site-footer">
