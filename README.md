@@ -1,4 +1,4 @@
-# playwright-polyglot-pom
+# playwright-polyglot-playground
 
 Two things in one repository:
 
