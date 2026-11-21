@@ -4,6 +4,7 @@ import com.microsoft.playwright.Locator.GetByRoleOptions
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat
 import com.microsoft.playwright.options.AriaRole.*
+import java.nio.file.Paths
 import java.util.regex.Pattern
 import java.util.regex.Pattern.CASE_INSENSITIVE
 
@@ -28,8 +29,11 @@ class Homepage(private val page: Page) {
     }
 
     companion object {
+        // The fictional site in ../site, opened straight from disk (Gradle runs the tests from kotlin/)
+        private val homepageUrl = Paths.get("..", "site", "index.html").toAbsolutePath().normalize().toUri().toString()
+
         fun navigate(page: Page): Homepage {
-            page.navigate("https://example.com")
+            page.navigate(homepageUrl)
             assertThat(page).hasTitle(
                 Pattern.compile(
                     "Acme Cloud – Simple and secure file sharing",

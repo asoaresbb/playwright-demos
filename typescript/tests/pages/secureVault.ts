@@ -1,4 +1,4 @@
-import { Page } from "@playwright/test"
+import { expect, Page } from "@playwright/test"
 import { InquiryForm } from "../components/inquiryForm.ts"
 import { step } from "../testStep.ts"
 
@@ -23,5 +23,12 @@ export class SecureVault {
     message: string
   }) {
     await this.inquiryForm.fillInquiryForm(inquiryData)
+  }
+
+  @step
+  async expectConfirmation(firstName: string) {
+    await expect(this.page.getByRole("status")).toHaveText(
+      `Thank you, ${firstName}. We will get back to you soon.`
+    )
   }
 }

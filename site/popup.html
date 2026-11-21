@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Privacy policy</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="popup-body">
+  <p>We updated our privacy policy.</p>
+  <div class="button-container" role="button" tabindex="0">Got it</div>
+  <script>
+    document.querySelector(".button-container").addEventListener("click", () => {
+      window.parent.postMessage("close-popup", "*")
+    })
+  </script>
+</body>
+</html>

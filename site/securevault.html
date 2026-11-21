@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>SecureVault</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main>
+    <h1>SecureVault</h1>
+    <p>Store and share documents with end-to-end encryption.</p>
+    <a href="#inquiry">Send inquiry</a>
+
+    <form id="inquiry">
+      <h2>Send us an inquiry</h2>
+      <label>First name <input type="text" name="firstName" required></label>
+      <label>Last name <input type="text" name="lastName" required></label>
+      <label>Email <input type="text" name="email" required></label>
+      <label>Phone number <input type="text" name="phoneNumber"></label>
+      <label>Message <textarea name="message"></textarea></label>
+      <label><input type="checkbox" name="marketing"> I agree to receive marketing communications from Acme Cloud</label>
+      <label><input type="checkbox" name="privacy" required> I agree to allow Acme Cloud to store and process my personal data</label>
+      <button type="submit">Submit</button>
+    </form>
+
+    <p role="status" id="confirmation"></p>
+  </main>
+
+  <script>
+    // Nothing is sent: the form only shows a confirmation, which the tests check
+    document.getElementById("inquiry").addEventListener("submit", (event) => {
+      event.preventDefault()
+      const firstName = event.target.elements.firstName.value
+      document.getElementById("confirmation").textContent =
+        `Thank you, ${firstName}. We will get back to you soon.`
+      event.target.hidden = true
+    })
+  </script>
+</body>
+</html>

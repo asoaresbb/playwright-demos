@@ -10,8 +10,9 @@ test("send inquiry about SecureVault", async ({ page }) => {
   await secureVault.fillInquiryForm({
     firstName: "User",
     lastName: "Test",
-    email: "test@abc.com",
+    email: "test@example.com",
     phoneNumber: "+351900000000",
     message: "I want to know more about..",
   })
+  await secureVault.expectConfirmation("User")
 })

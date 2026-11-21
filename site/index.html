@@ -1,0 +1,45 @@
+<!doctype html>
+<!-- Fictional company site used as the target of the tests. Nothing here is sent anywhere. -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Acme Cloud – Simple and secure file sharing</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <nav aria-label="Main">
+      <a href="index.html" class="logo">Acme Cloud</a>
+      <div class="menu">
+        <button type="button">Solutions</button>
+        <ul class="submenu">
+          <li><a href="securevault.html">SecureVault</a></li>
+        </ul>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <h1>Simple and secure file sharing</h1>
+    <p>Acme Cloud is a fictional company, made up for these tests.</p>
+  </main>
+
+  <div class="cookie-banner" role="dialog" aria-label="Cookies">
+    <p>We use cookies to improve your experience.</p>
+    <button type="button" id="accept-cookies">Accept</button>
+  </div>
+
+  <!-- A popup inside an iframe, so the tests have to switch into a frame to close it -->
+  <iframe src="popup.html" title="Popup CTA" class="popup"></iframe>
+
+  <script>
+    document.getElementById("accept-cookies").addEventListener("click", () => {
+      document.querySelector(".cookie-banner").remove()
+    })
+    // The popup page asks to be closed with postMessage (works across origins, including file://)
+    window.addEventListener("message", (event) => {
+      if (event.data === "close-popup") document.querySelector(".popup").remove()
+    })
+  </script>
+</body>
+</html>

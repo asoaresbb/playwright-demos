@@ -7,7 +7,7 @@ export class Homepage {
 
   @step
   static async navigate(page: Page) {
-    await page.goto("/")
+    await page.goto("index.html")
     await expect(page).toHaveTitle(/Acme Cloud – Simple and secure file sharing/i)
     return new Homepage(page)
   }
