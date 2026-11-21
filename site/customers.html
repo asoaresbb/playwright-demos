@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Customers – Acme Cloud</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .filters { display: grid; gap: 1rem; margin-bottom: 1.5rem; }
+    .filters .field { max-width: 24rem; }
+    .field input[type="search"] { font: inherit; font-weight: 400; font-size: 1rem; padding: 0.65rem 0.75rem; border: 1px solid #b8c3ce; border-radius: var(--radius-sm); }
+    .result-count { margin: 0 0 1rem; color: var(--muted); font-size: 0.95rem; }
+
+    .customer-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0 2.5rem; margin: 0; padding: 0; list-style: none; }
+    .customer-list li { display: flex; flex-direction: column; padding: 1.5rem 0; border-top: 2px solid var(--ink); }
+    .customer-list h2 { margin: 0; font-size: 1.15rem; color: var(--ink); }
+    .customer-list .meta { margin: 0.2rem 0 0.9rem; color: var(--muted); font-size: 0.88rem; }
+    .customer-list blockquote { margin: 0 0 1.1rem; color: var(--text); flex: 1; }
+    .customer-list .btn { align-self: flex-start; }
+    .load-more { margin-top: 1rem; }
+    dialog blockquote { margin: 1rem 0; padding-left: 1rem; border-left: 3px solid var(--seal); color: var(--ink); font-weight: 600; }
+    dialog dl { display: grid; grid-template-columns: auto 1fr; gap: 0.3rem 1rem; margin: 1rem 0 0; font-size: 0.93rem; }
+    dialog dt { color: var(--muted); }
+    dialog dd { margin: 0; }
+
+    @media (max-width: 860px) { .customer-list { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div id="site-header"></div>
+
+  <main class="wrap">
+    <section class="page-head">
+      <h1>Customers</h1>
+      <p>Legal, finance and public sector teams use Acme Cloud to share the documents that can't go by email.</p>
+    </section>
+
+    <section class="filters" aria-label="Filter customers">
+      <label class="field">Search customers
+        <input type="search" id="search" placeholder="Name or country">
+      </label>
+      <ul class="chips" aria-label="Industry">
+        <li><button type="button" aria-pressed="true" data-industry="">All</button></li>
+        <li><button type="button" aria-pressed="false" data-industry="Legal">Legal</button></li>
+        <li><button type="button" aria-pressed="false" data-industry="Finance">Finance</button></li>
+        <li><button type="button" aria-pressed="false" data-industry="Healthcare">Healthcare</button></li>
+        <li><button type="button" aria-pressed="false" data-industry="Public sector">Public sector</button></li>
+        <li><button type="button" aria-pressed="false" data-industry="Manufacturing">Manufacturing</button></li>
+      </ul>
+    </section>
+
+    <p class="result-count" role="status" id="result-count"></p>
+    <ul class="customer-list" id="customer-list" aria-label="Customer stories"></ul>
+    <div class="empty-state" id="empty-state" hidden>
+      <p id="empty-message"></p>
+      <button type="button" class="btn btn-secondary" id="clear-filters">Clear filters</button>
+    </div>
+    <p class="loading" id="loading" hidden>Loading more customers…</p>
+    <button type="button" class="btn btn-secondary load-more" id="load-more">Load more</button>
+  </main>
+
+  <dialog id="story" aria-labelledby="story-title">
+    <div class="dialog-body">
+      <h2 id="story-title"></h2>
+      <p id="story-text"></p>
+      <blockquote id="story-quote"></blockquote>
+      <dl>
+        <dt>Industry</dt><dd id="story-industry"></dd>
+        <dt>Country</dt><dd id="story-country"></dd>
+        <dt>Users</dt><dd id="story-users"></dd>
+      </dl>
+    </div>
+    <div class="dialog-actions">
+      <button type="button" class="btn" id="close-story">Close</button>
+    </div>
+  </dialog>
+
+  <div id="site-footer"></div>
+  <script src="layout.js"></script>
+
+  <script>
+    // All customers are fictional
+    const customers = [
+      { name: "Halden Legal", industry: "Legal", country: "Norway", users: 140, quote: "Our clients stopped asking whether email is safe.", story: "Halden Legal moved every deal room to SecureVault in one quarter, and now closes data rooms the day a deal signs." },
+      { name: "Morrow & Pike", industry: "Legal", country: "United Kingdom", users: 320, quote: "The audit log answers the question before the client asks it.", story: "Morrow & Pike exports the access log for every litigation matter and attaches it to the court bundle." },
+      { name: "Northfield Health", industry: "Healthcare", country: "Ireland", users: 85, quote: "Patient referrals no longer sit in shared inboxes.", story: "Northfield Health sends referral letters through expiring links that open only after a one-time code." },
+      { name: "Ostrava Capital", industry: "Finance", country: "Czechia", users: 60, quote: "Investors see the model, not a copy they can forward.", story: "Ostrava Capital shares fund models with view-only access and the investor's name watermarked on each page." },
+      { name: "Brightwater Foods", industry: "Manufacturing", country: "Netherlands", users: 210, quote: "Supplier contracts finally live in one place.", story: "Brightwater Foods replaced three file-sharing tools with one workspace for supplier contracts and audits." },
+      { name: "Vale do Tejo Municipality", industry: "Public sector", country: "Portugal", users: 450, quote: "Tender documents reach every bidder at the same moment.", story: "The municipality publishes tender files in a SecureVault room that opens for all bidders at the same time." },
+      { name: "Lindqvist & Berg", industry: "Legal", country: "Sweden", users: 95, quote: "We revoke access the minute a matter closes.", story: "Lindqvist & Berg sets every client room to expire 30 days after the matter is marked as closed." },
+      { name: "Aurelia Bank", industry: "Finance", country: "Italy", users: 480, quote: "Regulators get exactly the files they asked for.", story: "Aurelia Bank answers supervisory requests from a dedicated room, with downloads disabled by default." },
+      { name: "St. Clement Clinic", industry: "Healthcare", country: "Malta", users: 40, quote: "Lab results go to the right specialist, and only them.", story: "St. Clement Clinic shares lab results with external specialists through links tied to one email address." },
+      { name: "Kessler Maschinenbau", industry: "Manufacturing", country: "Germany", users: 260, quote: "Drawings leave the building with a name on every page.", story: "Kessler sends engineering drawings to partners with watermarks and print disabled." },
+      { name: "Port of Gdańsk Authority", industry: "Public sector", country: "Poland", users: 175, quote: "Contractors only see the documents for their berth.", story: "The port authority gives each contractor a room limited to the documents for their own project." },
+      { name: "Moreau Avocats", industry: "Legal", country: "France", users: 70, quote: "Clients sign off faster when everything is in one room.", story: "Moreau Avocats collects signed documents from clients in a room that keeps every version." },
+      { name: "Nordlys Pensions", industry: "Finance", country: "Denmark", users: 130, quote: "Member statements are encrypted before they leave us.", story: "Nordlys Pensions sends annual statements through encrypted links instead of attachments." },
+      { name: "Clínica Atlântico", industry: "Healthcare", country: "Portugal", users: 55, quote: "Second opinions arrive in hours, not days.", story: "Clínica Atlântico shares imaging studies with partner hospitals for second opinions." },
+      { name: "Ferro & Figli", industry: "Manufacturing", country: "Italy", users: 120, quote: "Quality audits run on one shared checklist.", story: "Ferro & Figli runs supplier quality audits with evidence uploaded to one room per supplier." },
+      { name: "Canton of Vaud IT Office", industry: "Public sector", country: "Switzerland", users: 390, quote: "Data stays in Switzerland, and we can prove it.", story: "The IT office chose Zurich hosting and exports the audit log every month for its records." },
+      { name: "Hartmann Treuhand", industry: "Finance", country: "Austria", users: 45, quote: "Tax season no longer means a flood of attachments.", story: "Hartmann Treuhand collects client tax documents through upload links that expire after the deadline." },
+      { name: "Baltic Legal Partners", industry: "Legal", country: "Lithuania", users: 110, quote: "Cross-border deals run from one room in three languages.", story: "Baltic Legal Partners runs deal rooms for clients in Lithuania, Latvia and Estonia from one workspace." },
+    ]
+
+    const PAGE_SIZE = 6
+    let shown = PAGE_SIZE
+    let industry = ""
+
+    const list = document.getElementById("customer-list")
+    const count = document.getElementById("result-count")
+    const search = document.getElementById("search")
+    const loadMore = document.getElementById("load-more")
+    const loading = document.getElementById("loading")
+    const emptyState = document.getElementById("empty-state")
+
+    const matches = () => {
+      const text = search.value.trim().toLowerCase()
+      return customers.filter((c) =>
+        (!industry || c.industry === industry) &&
+        (!text || c.name.toLowerCase().includes(text) || c.country.toLowerCase().includes(text)))
+    }
+
+    const render = () => {
+      const results = matches()
+      const visible = results.slice(0, shown)
+      list.innerHTML = ""
+      for (const customer of visible) {
+        const item = document.createElement("li")
+        item.innerHTML = `
+          <h2></h2>
+          <p class="meta"></p>
+          <blockquote></blockquote>
+          <button type="button" class="btn btn-secondary btn-small">Read story</button>`
+        item.querySelector("h2").textContent = customer.name
+        item.querySelector(".meta").textContent = `${customer.industry}, ${customer.country}`
+        item.querySelector("blockquote").textContent = `“${customer.quote}”`
+        const button = item.querySelector("button")
+        button.setAttribute("aria-label", `Read story: ${customer.name}`)
+        button.addEventListener("click", () => openStory(customer))
+        list.append(item)
+      }
+      count.textContent = `Showing ${visible.length} of ${results.length} customers`
+      loadMore.hidden = visible.length >= results.length
+      emptyState.hidden = results.length > 0
+      if (results.length === 0) {
+        document.getElementById("empty-message").textContent = search.value.trim()
+          ? `No customers match “${search.value.trim()}”.`
+          : "No customers in this industry yet."
+      }
+    }
+
+    search.addEventListener("input", () => { shown = PAGE_SIZE; render() })
+
+    for (const chip of document.querySelectorAll(".chips button")) {
+      chip.addEventListener("click", () => {
+        for (const other of document.querySelectorAll(".chips button")) other.setAttribute("aria-pressed", "false")
+        chip.setAttribute("aria-pressed", "true")
+        industry = chip.dataset.industry
+        shown = PAGE_SIZE
+        render()
+      })
+    }
+
+    // "Load more" waits a moment, like a real request would
+    loadMore.addEventListener("click", () => {
+      loadMore.hidden = true
+      loading.hidden = false
+      setTimeout(() => {
+        loading.hidden = true
+        shown += PAGE_SIZE
+        render()
+      }, 800)
+    })
+
+    document.getElementById("clear-filters").addEventListener("click", () => {
+      search.value = ""
+      document.querySelector('.chips button[data-industry=""]').click()
+    })
+
+    const dialog = document.getElementById("story")
+    const openStory = (customer) => {
+      document.getElementById("story-title").textContent = customer.name
+      document.getElementById("story-text").textContent = customer.story
+      document.getElementById("story-quote").textContent = `“${customer.quote}”`
+      document.getElementById("story-industry").textContent = customer.industry
+      document.getElementById("story-country").textContent = customer.country
+      document.getElementById("story-users").textContent = customer.users
+      dialog.showModal()
+    }
+    document.getElementById("close-story").addEventListener("click", () => dialog.close())
+
+    render()
+  </script>
+</body>
+</html>

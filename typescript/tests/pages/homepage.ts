@@ -15,8 +15,8 @@ export class Homepage {
   }
 
   async closePrivacyPolicy() {
-    const policyIframe = this.page.frameLocator("iframe[title='Popup CTA']")
-    await policyIframe.locator("css=.button-container").click()
+    const policy = this.page.getByTitle("Popup CTA").contentFrame()
+    await policy.getByRole("button", { name: "Got it" }).click()
   }
 
   async pickSecureVaultSolution() {

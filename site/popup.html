@@ -9,13 +9,10 @@
 <body class="popup-body">
   <h2>We updated our privacy policy</h2>
   <p>We now list every subprocessor we use and where it stores data. Nothing changes in how we handle your files.</p>
-  <div class="button-container" role="button" tabindex="0">Got it</div>
+  <button type="button" class="popup-button">Got it</button>
   <script>
-    const close = () => window.parent.postMessage("close-popup", "*")
-    const button = document.querySelector(".button-container")
-    button.addEventListener("click", close)
-    button.addEventListener("keydown", (event) => {
-      if (event.key === "Enter" || event.key === " ") close()
+    document.querySelector(".popup-button").addEventListener("click", () => {
+      window.parent.postMessage("close-popup", "*")
     })
   </script>
 </body>

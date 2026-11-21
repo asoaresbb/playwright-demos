@@ -1,5 +1,6 @@
 package pages
 
+import com.microsoft.playwright.FrameLocator
 import com.microsoft.playwright.Locator.GetByRoleOptions
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat
@@ -15,8 +16,8 @@ class Homepage(private val page: Page) {
     }
 
     fun `close privacy policy`(): Homepage {
-        val policyIframe = page.frameLocator("iframe[title='Popup CTA']")
-        policyIframe.locator("css=.button-container").click()
+        val policy = page.getByTitle("Popup CTA").contentFrame()
+        policy.getByRole(BUTTON, FrameLocator.GetByRoleOptions().setName("Got it")).click()
         return this
     }
 

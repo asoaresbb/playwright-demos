@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Audit Log – Acme Cloud</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .field input[type="date"], .field input[type="search"] { font: inherit; font-weight: 400; font-size: 1rem; padding: 0.55rem 0.7rem; border: 1px solid #b8c3ce; border-radius: var(--radius-sm); }
+    .toolbar .export { margin-left: auto; }
+    .action { display: inline-block; padding: 0.1rem 0.55rem; border-radius: 999px; font-size: 0.82rem; font-weight: 600; background: var(--surface); }
+    .action-Viewed { background: #e7eef6; color: #23466b; }
+    .action-Downloaded { background: var(--seal-pale); color: var(--seal-dark); }
+    .action-Shared { background: #f3ecdc; color: #6b4f12; }
+    .action-Revoked { background: #fbeeed; color: #7f231f; }
+  </style>
+</head>
+<body>
+  <div id="site-header"></div>
+
+  <main class="wrap">
+    <section class="page-head">
+      <h1>Audit Log</h1>
+      <p>Every view, download, share and revoke, with who did it and when. Filter it, page through it, and export it for an auditor. Try it below with a sample workspace.</p>
+    </section>
+
+    <section class="section" aria-labelledby="demo-title">
+      <h2 id="demo-title">Sample workspace activity</h2>
+      <form class="toolbar" id="filters" novalidate>
+        <label class="field">Action
+          <select name="action">
+            <option value="">All actions</option>
+            <option>Viewed</option>
+            <option>Downloaded</option>
+            <option>Shared</option>
+            <option>Revoked</option>
+          </select>
+        </label>
+        <label class="field">Person
+          <input type="search" name="person" placeholder="Name">
+        </label>
+        <label class="field">From
+          <input type="date" name="from" min="2026-03-01" max="2026-03-31">
+        </label>
+        <label class="field">To
+          <input type="date" name="to" min="2026-03-01" max="2026-03-31">
+        </label>
+        <button type="button" class="btn btn-secondary export" id="export">Export CSV</button>
+      </form>
+      <p class="field-error" role="alert" id="date-error"></p>
+
+      <p class="loading" role="status" id="loading">Loading events…</p>
+      <div class="table-frame" id="events-frame" hidden>
+        <table class="data-table" aria-label="Events">
+          <thead>
+            <tr>
+              <th scope="col">Date and time</th>
+              <th scope="col">Person</th>
+              <th scope="col">Action</th>
+              <th scope="col">File</th>
+              <th scope="col" class="hide-small">Location</th>
+            </tr>
+          </thead>
+          <tbody id="event-rows"></tbody>
+        </table>
+      </div>
+      <div class="empty-state" id="events-empty" hidden>No events match these filters. Widen the dates or choose all actions.</div>
+      <nav class="pagination" aria-label="Pages" id="pagination" hidden>
+        <button type="button" class="btn btn-secondary btn-small" id="previous">Previous</button>
+        <span id="page-label"></span>
+        <button type="button" class="btn btn-secondary btn-small" id="next">Next</button>
+      </nav>
+    </section>
+  </main>
+
+  <div id="site-footer"></div>
+  <script src="layout.js"></script>
+
+  <script>
+    // A fixed, made-up set of events, so the results are the same on every run
+    const people = ["Inês Duarte", "Tomás Reis", "Clara Moura", "Jonas Berg", "Amélie Moreau", "Piotr Nowak"]
+    const actions = ["Viewed", "Viewed", "Downloaded", "Shared", "Viewed", "Revoked", "Viewed", "Downloaded"]
+    const fileNames = ["Share purchase agreement – final.pdf", "Board minutes – March.docx", "Payroll export Q1.xlsx", "Audit report 2025.pdf", "NDA – Ostrava Capital.pdf"]
+    const places = ["Lisbon", "Porto", "Oslo", "Paris", "Warsaw", "Zurich"]
+    const events = Array.from({ length: 42 }, (_, i) => {
+      const day = String(31 - Math.floor(i * 0.72)).padStart(2, "0")
+      const hour = String(8 + ((i * 5) % 10)).padStart(2, "0")
+      const minute = String((i * 17) % 60).padStart(2, "0")
+      return {
+        when: `2026-03-${day} ${hour}:${minute}`,
+        person: people[(i * 7) % people.length],
+        action: actions[i % actions.length],
+        file: fileNames[(i * 3) % fileNames.length],
+        location: places[(i * 5) % places.length],
+      }
+    })
+
+    const PAGE_SIZE = 10
+    let page = 1
+    const $ = (id) => document.getElementById(id)
+    const filters = $("filters")
+
+    const filtered = () => {
+      const { action, person, from, to } = filters.elements
+      const name = person.value.trim().toLowerCase()
+      return events.filter((event) => {
+        const date = event.when.slice(0, 10)
+        return (!action.value || event.action === action.value) &&
+          (!name || event.person.toLowerCase().includes(name)) &&
+          (!from.value || date >= from.value) &&
+          (!to.value || date <= to.value)
+      })
+    }
+
+    const render = () => {
+      const { from, to } = filters.elements
+      $("date-error").textContent = from.value && to.value && from.value > to.value
+        ? "The start date must be before the end date."
+        : ""
+      const list = filtered()
+      const pages = Math.max(1, Math.ceil(list.length / PAGE_SIZE))
+      page = Math.min(page, pages)
+      const rows = $("event-rows")
+      rows.innerHTML = ""
+      for (const event of list.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)) {
+        const row = document.createElement("tr")
+        row.innerHTML = `<td></td><td></td><td><span class="action"></span></td><td></td><td class="hide-small"></td>`
+        row.children[0].textContent = event.when
+        row.children[1].textContent = event.person
+        const badge = row.querySelector(".action")
+        badge.textContent = event.action
+        badge.classList.add(`action-${event.action}`)
+        row.children[3].textContent = event.file
+        row.children[4].textContent = event.location
+        rows.append(row)
+      }
+      $("events-frame").hidden = list.length === 0
+      $("events-empty").hidden = list.length > 0
+      $("pagination").hidden = list.length === 0
+      $("page-label").textContent = `Page ${page} of ${pages}`
+      $("previous").disabled = page === 1
+      $("next").disabled = page === pages
+    }
+
+    filters.addEventListener("input", () => { page = 1; render() })
+    filters.addEventListener("submit", (event) => event.preventDefault())
+    $("previous").addEventListener("click", () => { page--; render() })
+    $("next").addEventListener("click", () => { page++; render() })
+
+    // Downloads the filtered events as a CSV file
+    $("export").addEventListener("click", () => {
+      const quote = (value) => `"${String(value).replaceAll('"', '""')}"`
+      const lines = [["Date and time", "Person", "Action", "File", "Location"].map(quote).join(",")]
+      for (const event of filtered()) lines.push([event.when, event.person, event.action, event.file, event.location].map(quote).join(","))
+      const blob = new Blob([lines.join("\n") + "\n"], { type: "text/csv" })
+      const link = document.createElement("a")
+      link.href = URL.createObjectURL(blob)
+      link.download = "audit-log.csv"
+      link.click()
+      URL.revokeObjectURL(link.href)
+    })
+
+    // The events "arrive" after a short delay, like a real request
+    setTimeout(() => {
+      $("loading").hidden = true
+      render()
+    }, 1200)
+  </script>
+</body>
+</html>

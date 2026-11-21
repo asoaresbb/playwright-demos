@@ -9,25 +9,7 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header class="site-header">
-    <nav aria-label="Main" class="wrap">
-      <a href="index.html" class="logo"><span class="logo-mark" aria-hidden="true"></span>Acme Cloud</a>
-      <div class="nav-links">
-        <div class="menu">
-          <button type="button" aria-haspopup="true">Solutions</button>
-          <ul class="submenu">
-            <li><a href="securevault.html">SecureVault<small>Encrypted rooms for contracts and board papers</small></a></li>
-            <li><a href="securevault.html">Audit Log<small>See who opened what, and when</small></a></li>
-          </ul>
-        </div>
-        <a href="#">Pricing</a>
-        <a href="#">Customers</a>
-      </div>
-      <div class="nav-actions">
-        <a href="#">Sign in</a>
-      </div>
-    </nav>
-  </header>
+  <div id="site-header"></div>
 
   <main class="wrap">
     <section class="product-hero">
@@ -70,12 +52,8 @@
     </section>
   </main>
 
-  <footer class="site-footer">
-    <div class="wrap">
-      <p>© Acme Cloud. A fictional company, made up as the target of these tests.</p>
-      <p>Privacy · Terms · Security</p>
-    </div>
-  </footer>
+  <div id="site-footer"></div>
+  <script src="layout.js"></script>
 
   <script>
     // Nothing is sent: the form only shows a confirmation, which the tests check

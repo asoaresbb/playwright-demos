@@ -34,8 +34,8 @@ class Homepage:
         return self
 
     def close_privacy_policy(self) -> 'Homepage':
-        policy_iframe = self.page.frame_locator("iframe[title='Popup CTA']")
-        policy_iframe.locator(".button-container").click()
+        policy = self.page.get_by_title("Popup CTA").content_frame
+        policy.get_by_role("button", name="Got it").click()
         return self
 
     def pick_secure_vault_solution(self) -> 'SecureVault':

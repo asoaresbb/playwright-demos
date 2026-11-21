@@ -1,0 +1,432 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sign in – Acme Cloud</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .signin { max-width: 26rem; margin: 4rem auto 5rem; }
+    .signin h1 { margin: 0 0 0.5rem; color: var(--ink); font-size: 2rem; letter-spacing: -0.03em; }
+    .signin > p { margin: 0 0 1.75rem; color: var(--muted); }
+    .signin form { display: grid; gap: 1.1rem; background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 2rem; }
+    .password-row { display: flex; gap: 0.5rem; }
+    .password-row input { flex: 1; }
+    .consent { display: flex; gap: 0.6rem; align-items: center; font-size: 0.93rem; color: var(--text); }
+    .consent input { accent-color: var(--seal); }
+
+    .files-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 1rem; padding: 3rem 0 1.5rem; }
+    .files-head h1 { margin: 0; color: var(--ink); font-size: 2.2rem; letter-spacing: -0.03em; }
+    .files-head p { margin: 0.3rem 0 0; color: var(--muted); }
+    .account { position: relative; }
+    .account-menu { position: absolute; right: 0; top: calc(100% + 0.4rem); z-index: 10; min-width: 12rem; margin: 0; padding: 0.4rem; list-style: none; background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: 0 12px 32px -12px rgba(20, 40, 58, 0.35); }
+    .account-menu button { width: 100%; text-align: left; font: inherit; padding: 0.55rem 0.75rem; border: 0; background: none; border-radius: var(--radius-sm); cursor: pointer; color: var(--text); }
+    .account-menu button:hover, .account-menu button:focus-visible { background: var(--surface); }
+    .upload input[type="file"] { position: absolute; width: 1px; height: 1px; opacity: 0; }
+    .upload label { cursor: pointer; }
+    .upload:focus-within label { outline: 3px solid var(--seal); outline-offset: 2px; }
+    .bulk { display: flex; align-items: center; gap: 0.9rem; margin-left: auto; }
+    .file-name { font-weight: 600; color: var(--ink); }
+    .row-actions { display: flex; gap: 0.4rem; justify-content: flex-end; }
+    .data-table td:first-child, .data-table th:first-child { width: 2.5rem; }
+  </style>
+</head>
+<body>
+  <div id="site-header"></div>
+
+  <main class="wrap">
+    <!-- Sign in -->
+    <section class="signin" id="signin-view" aria-labelledby="signin-title">
+      <h1 id="signin-title">Sign in to Acme Cloud</h1>
+      <p>Use the email address of your workspace.</p>
+      <form id="signin-form" novalidate>
+        <p class="alert" role="alert" id="signin-error"></p>
+        <label class="field">Email
+          <input type="email" name="email" autocomplete="username" placeholder="name@company.com" aria-describedby="email-error">
+          <span class="field-error" id="email-error"></span>
+        </label>
+        <div class="field">
+          <label for="password">Password</label>
+          <div class="password-row">
+            <input type="password" id="password" name="password" autocomplete="current-password" aria-describedby="password-error">
+            <button type="button" class="btn btn-secondary btn-small" id="toggle-password" aria-pressed="false">Show</button>
+          </div>
+          <span class="field-error" id="password-error"></span>
+        </div>
+        <label class="consent"><input type="checkbox" name="remember"> Keep me signed in</label>
+        <button type="submit" class="btn">Sign in</button>
+      </form>
+    </section>
+
+    <!-- Files, shown after signing in -->
+    <section id="files-view" aria-labelledby="files-title" hidden>
+      <div class="files-head">
+        <div>
+          <h1 id="files-title">Files</h1>
+          <p id="files-summary"></p>
+        </div>
+        <div class="account">
+          <button type="button" class="btn btn-secondary" id="account-button" aria-haspopup="menu" aria-expanded="false" aria-controls="account-menu">Inês Duarte</button>
+          <ul class="account-menu" id="account-menu" role="menu" aria-label="Account" hidden>
+            <li role="none"><button type="button" role="menuitem" id="settings">Settings</button></li>
+            <li role="none"><button type="button" role="menuitem" id="sign-out">Sign out</button></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <label class="field">Filter files
+          <input type="search" id="filter" placeholder="File name">
+        </label>
+        <div class="upload">
+          <input type="file" id="upload" multiple>
+          <label for="upload" class="btn btn-secondary">Upload files</label>
+        </div>
+        <div class="bulk">
+          <span id="selection-count">No files selected</span>
+          <button type="button" class="btn btn-danger" id="delete-selected" disabled>Delete selected</button>
+        </div>
+      </div>
+
+      <div class="table-frame">
+        <table class="data-table" aria-label="Files">
+          <thead>
+            <tr>
+              <th scope="col"><input type="checkbox" id="select-all" aria-label="Select all files"></th>
+              <th scope="col" aria-sort="ascending"><button type="button" class="sort-button" data-key="name">Name</button></th>
+              <th scope="col" class="hide-small" aria-sort="none"><button type="button" class="sort-button" data-key="sharedWith">Shared with</button></th>
+              <th scope="col" class="num" aria-sort="none"><button type="button" class="sort-button" data-key="size">Size</button></th>
+              <th scope="col" class="hide-small" aria-sort="none"><button type="button" class="sort-button" data-key="modified">Modified</button></th>
+              <th scope="col"><span class="visually-hidden">Actions</span></th>
+            </tr>
+          </thead>
+          <tbody id="file-rows"></tbody>
+        </table>
+      </div>
+      <div class="empty-state" id="files-empty" hidden></div>
+    </section>
+  </main>
+
+  <dialog id="share-dialog" aria-labelledby="share-title">
+    <form method="dialog" id="share-form" novalidate>
+      <div class="dialog-body">
+        <h2 id="share-title">Share file</h2>
+        <div class="dialog-form">
+          <label class="field">Share with
+            <input type="email" name="recipient" placeholder="name@company.com">
+            <span class="field-error" id="recipient-error"></span>
+          </label>
+          <label class="field">Link expires
+            <select name="expiry">
+              <option value="1 day">In 1 day</option>
+              <option value="7 days" selected>In 7 days</option>
+              <option value="30 days">In 30 days</option>
+            </select>
+          </label>
+          <label class="consent"><input type="checkbox" name="downloads"> Allow downloads</label>
+        </div>
+      </div>
+      <div class="dialog-actions">
+        <button type="button" class="btn btn-secondary" id="cancel-share">Cancel</button>
+        <button type="submit" class="btn">Share</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="delete-dialog" aria-labelledby="delete-title">
+    <div class="dialog-body">
+      <h2 id="delete-title">Delete file?</h2>
+      <p id="delete-text"></p>
+    </div>
+    <div class="dialog-actions">
+      <button type="button" class="btn btn-secondary" id="cancel-delete">Cancel</button>
+      <button type="button" class="btn btn-danger" id="confirm-delete">Delete</button>
+    </div>
+  </dialog>
+
+  <p class="toast" role="status" id="toast"></p>
+
+  <div id="site-footer"></div>
+  <script src="layout.js"></script>
+
+  <script>
+    // Demo account of the fictional workspace (see CHALLENGES.md)
+    const DEMO_EMAIL = "ines.duarte@acmecloud.test"
+    const DEMO_PASSWORD = "vault-demo-2024"
+    const SESSION_KEY = "acme-session"
+    const MAX_ATTEMPTS = 3
+    const LOCK_SECONDS = 30
+
+    const initialFiles = [
+      { name: "Share purchase agreement – final.pdf", sharedWith: 2, size: 2_400_000, modified: "2026-03-14" },
+      { name: "Board minutes – March.docx", sharedWith: 5, size: 380_000, modified: "2026-03-12" },
+      { name: "Payroll export Q1.xlsx", sharedWith: 1, size: 920_000, modified: "2026-03-31" },
+      { name: "Due diligence checklist.xlsx", sharedWith: 8, size: 150_000, modified: "2026-02-27" },
+      { name: "NDA – Ostrava Capital.pdf", sharedWith: 3, size: 210_000, modified: "2026-01-19" },
+      { name: "Audit report 2025.pdf", sharedWith: 4, size: 5_100_000, modified: "2026-02-08" },
+      { name: "Supplier contract – Kessler.pdf", sharedWith: 2, size: 1_300_000, modified: "2026-03-03" },
+      { name: "Data processing agreement.docx", sharedWith: 0, size: 95_000, modified: "2026-03-21" },
+    ]
+    let files = initialFiles.map((file) => ({ ...file }))
+    let sort = { key: "name", direction: "ascending" }
+    let selected = new Set()
+    let failedAttempts = 0
+
+    const $ = (id) => document.getElementById(id)
+    const formatSize = (bytes) => bytes >= 1_000_000 ? `${(bytes / 1_000_000).toFixed(1)} MB` : `${Math.round(bytes / 1000)} KB`
+    const showToast = (message) => {
+      $("toast").textContent = message
+      clearTimeout(showToast.timer)
+      showToast.timer = setTimeout(() => { $("toast").textContent = "" }, 4000)
+    }
+
+    // ---------- Session ----------
+
+    const showFiles = () => {
+      $("signin-view").hidden = true
+      $("files-view").hidden = false
+      document.title = "Files – Acme Cloud"
+      renderFiles()
+    }
+    const showSignIn = () => {
+      $("files-view").hidden = true
+      $("signin-view").hidden = false
+      document.title = "Sign in – Acme Cloud"
+    }
+
+    $("toggle-password").addEventListener("click", (event) => {
+      const input = $("password")
+      const visible = input.type === "password"
+      input.type = visible ? "text" : "password"
+      event.currentTarget.textContent = visible ? "Hide" : "Show"
+      event.currentTarget.setAttribute("aria-pressed", String(visible))
+    })
+
+    const lockForm = () => {
+      const form = $("signin-form")
+      const submit = form.querySelector('button[type="submit"]')
+      let remaining = LOCK_SECONDS
+      submit.disabled = true
+      const tick = () => {
+        $("signin-error").textContent = `Too many attempts. Try again in ${remaining} seconds.`
+        if (remaining-- === 0) {
+          clearInterval(timer)
+          submit.disabled = false
+          failedAttempts = 0
+          $("signin-error").textContent = ""
+        }
+      }
+      tick()
+      const timer = setInterval(tick, 1000)
+    }
+
+    $("signin-form").addEventListener("submit", (event) => {
+      event.preventDefault()
+      const form = event.target
+      const email = form.elements.email.value.trim()
+      const password = form.elements.password.value
+      $("signin-error").textContent = ""
+      $("email-error").textContent = ""
+      $("password-error").textContent = ""
+
+      let valid = true
+      if (!email) { $("email-error").textContent = "Enter your email address."; valid = false }
+      else if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { $("email-error").textContent = "Enter an email address like name@company.com."; valid = false }
+      if (!password) { $("password-error").textContent = "Enter your password."; valid = false }
+      if (!valid) return
+
+      if (email.toLowerCase() !== DEMO_EMAIL || password !== DEMO_PASSWORD) {
+        failedAttempts++
+        if (failedAttempts >= MAX_ATTEMPTS) lockForm()
+        else $("signin-error").textContent = `The email or password is incorrect. ${MAX_ATTEMPTS - failedAttempts} attempts left.`
+        return
+      }
+
+      failedAttempts = 0
+      try {
+        if (form.elements.remember.checked) localStorage.setItem(SESSION_KEY, DEMO_EMAIL)
+      } catch { /* storage may be unavailable */ }
+      form.reset()
+      showFiles()
+    })
+
+    // ---------- Account menu ----------
+
+    const accountButton = $("account-button")
+    const accountMenu = $("account-menu")
+    const setMenu = (open) => {
+      accountMenu.hidden = !open
+      accountButton.setAttribute("aria-expanded", String(open))
+      if (open) accountMenu.querySelector('[role="menuitem"]').focus()
+    }
+    accountButton.addEventListener("click", () => setMenu(accountMenu.hidden))
+    accountMenu.addEventListener("keydown", (event) => { if (event.key === "Escape") { setMenu(false); accountButton.focus() } })
+    $("settings").addEventListener("click", () => { setMenu(false); showToast("Settings are not available in the demo.") })
+    $("sign-out").addEventListener("click", () => {
+      setMenu(false)
+      try { localStorage.removeItem(SESSION_KEY) } catch { /* ignore */ }
+      files = initialFiles.map((file) => ({ ...file }))
+      selected.clear()
+      showSignIn()
+      showToast("You signed out.")
+    })
+
+    // ---------- Files table ----------
+
+    const visibleFiles = () => {
+      const text = $("filter").value.trim().toLowerCase()
+      const list = files.filter((file) => file.name.toLowerCase().includes(text))
+      const factor = sort.direction === "ascending" ? 1 : -1
+      return list.sort((a, b) => (a[sort.key] > b[sort.key] ? 1 : a[sort.key] < b[sort.key] ? -1 : 0) * factor)
+    }
+
+    const renderFiles = () => {
+      const list = visibleFiles()
+      const tbody = $("file-rows")
+      tbody.innerHTML = ""
+      for (const file of list) {
+        const row = document.createElement("tr")
+        row.innerHTML = `
+          <td><input type="checkbox"></td>
+          <td class="file-name"></td>
+          <td class="hide-small"></td>
+          <td class="num"></td>
+          <td class="hide-small"></td>
+          <td><div class="row-actions">
+            <button type="button" class="btn btn-secondary btn-small">Share</button>
+            <button type="button" class="btn btn-secondary btn-small">Delete</button>
+          </div></td>`
+        const [checkboxCell, nameCell, sharedCell, sizeCell, modifiedCell] = row.children
+        const checkbox = checkboxCell.querySelector("input")
+        checkbox.setAttribute("aria-label", `Select ${file.name}`)
+        checkbox.checked = selected.has(file.name)
+        checkbox.addEventListener("change", () => {
+          checkbox.checked ? selected.add(file.name) : selected.delete(file.name)
+          updateSelection()
+        })
+        nameCell.textContent = file.name
+        sharedCell.textContent = file.sharedWith === 0 ? "Only you" : `${file.sharedWith} ${file.sharedWith === 1 ? "person" : "people"}`
+        sizeCell.textContent = formatSize(file.size)
+        modifiedCell.textContent = file.modified
+        const [shareButton, deleteButton] = row.querySelectorAll(".row-actions button")
+        shareButton.setAttribute("aria-label", `Share ${file.name}`)
+        deleteButton.setAttribute("aria-label", `Delete ${file.name}`)
+        shareButton.addEventListener("click", () => openShare(file))
+        deleteButton.addEventListener("click", () => openDelete(file))
+        tbody.append(row)
+      }
+
+      $("files-summary").textContent = `${files.length} files in your workspace`
+      const empty = $("files-empty")
+      empty.hidden = list.length > 0
+      empty.textContent = files.length === 0
+        ? "Your workspace is empty. Upload a file to start sharing."
+        : `No files match “${$("filter").value.trim()}”.`
+      for (const header of document.querySelectorAll("th[aria-sort]")) {
+        const key = header.querySelector(".sort-button").dataset.key
+        header.setAttribute("aria-sort", key === sort.key ? sort.direction : "none")
+      }
+      updateSelection()
+    }
+
+    const updateSelection = () => {
+      const names = new Set(files.map((file) => file.name))
+      selected = new Set([...selected].filter((name) => names.has(name)))
+      const count = selected.size
+      $("selection-count").textContent = count === 0 ? "No files selected" : `${count} ${count === 1 ? "file" : "files"} selected`
+      $("delete-selected").disabled = count === 0
+      const visible = visibleFiles()
+      const selectAll = $("select-all")
+      selectAll.checked = visible.length > 0 && visible.every((file) => selected.has(file.name))
+      selectAll.indeterminate = !selectAll.checked && visible.some((file) => selected.has(file.name))
+    }
+
+    $("filter").addEventListener("input", renderFiles)
+
+    for (const button of document.querySelectorAll(".sort-button")) {
+      button.addEventListener("click", () => {
+        const key = button.dataset.key
+        sort = { key, direction: sort.key === key && sort.direction === "ascending" ? "descending" : "ascending" }
+        renderFiles()
+      })
+    }
+
+    $("select-all").addEventListener("change", (event) => {
+      for (const file of visibleFiles()) event.target.checked ? selected.add(file.name) : selected.delete(file.name)
+      renderFiles()
+    })
+
+    // Bulk delete asks with the browser's own confirm dialog
+    $("delete-selected").addEventListener("click", () => {
+      const count = selected.size
+      if (!confirm(`Delete ${count} ${count === 1 ? "file" : "files"}? This can't be undone.`)) return
+      files = files.filter((file) => !selected.has(file.name))
+      selected.clear()
+      renderFiles()
+      showToast(`Deleted ${count} ${count === 1 ? "file" : "files"}.`)
+    })
+
+    $("upload").addEventListener("change", (event) => {
+      const added = [...event.target.files]
+      for (const upload of added) {
+        files = files.filter((file) => file.name !== upload.name)
+        files.push({ name: upload.name, sharedWith: 0, size: upload.size, modified: new Date().toISOString().slice(0, 10) })
+      }
+      event.target.value = ""
+      renderFiles()
+      if (added.length) showToast(added.length === 1 ? `Uploaded ${added[0].name}.` : `Uploaded ${added.length} files.`)
+    })
+
+    // ---------- Share dialog ----------
+
+    const shareDialog = $("share-dialog")
+    let sharing = null
+    const openShare = (file) => {
+      sharing = file
+      $("share-title").textContent = `Share ${file.name}`
+      $("share-form").reset()
+      $("recipient-error").textContent = ""
+      shareDialog.showModal()
+    }
+    $("cancel-share").addEventListener("click", () => shareDialog.close())
+    $("share-form").addEventListener("submit", (event) => {
+      const form = event.target
+      const recipient = form.elements.recipient.value.trim()
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(recipient)) {
+        event.preventDefault()
+        $("recipient-error").textContent = "Enter the email address of the person you're sharing with."
+        return
+      }
+      sharing.sharedWith++
+      const downloads = form.elements.downloads.checked ? "downloads allowed" : "view only"
+      renderFiles()
+      showToast(`Shared ${sharing.name} with ${recipient}. Link expires in ${form.elements.expiry.value}, ${downloads}.`)
+    })
+
+    // ---------- Delete dialog ----------
+
+    const deleteDialog = $("delete-dialog")
+    let deleting = null
+    const openDelete = (file) => {
+      deleting = file
+      $("delete-text").textContent = `${file.name} will be deleted for everyone it's shared with. This can't be undone.`
+      deleteDialog.showModal()
+    }
+    $("cancel-delete").addEventListener("click", () => deleteDialog.close())
+    $("confirm-delete").addEventListener("click", () => {
+      files = files.filter((file) => file !== deleting)
+      selected.delete(deleting.name)
+      deleteDialog.close()
+      renderFiles()
+      showToast(`Deleted ${deleting.name}.`)
+    })
+
+    // Restore the session last, once everything above is defined
+    let remembered = false
+    try { remembered = localStorage.getItem(SESSION_KEY) === DEMO_EMAIL } catch { /* storage may be unavailable */ }
+    if (remembered) showFiles()
+  </script>
+</body>
+</html>

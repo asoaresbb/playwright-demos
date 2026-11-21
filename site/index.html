@@ -10,26 +10,7 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header class="site-header">
-    <nav aria-label="Main" class="wrap">
-      <a href="index.html" class="logo"><span class="logo-mark" aria-hidden="true"></span>Acme Cloud</a>
-      <div class="nav-links">
-        <div class="menu">
-          <button type="button" aria-haspopup="true">Solutions</button>
-          <ul class="submenu">
-            <li><a href="securevault.html">SecureVault<small>Encrypted rooms for contracts and board papers</small></a></li>
-            <li><a href="securevault.html">Audit Log<small>See who opened what, and when</small></a></li>
-          </ul>
-        </div>
-        <a href="#">Pricing</a>
-        <a href="#">Customers</a>
-      </div>
-      <div class="nav-actions">
-        <a href="#">Sign in</a>
-        <a href="securevault.html#inquiry" class="button-link">Book a demo</a>
-      </div>
-    </nav>
-  </header>
+  <div id="site-header"></div>
 
   <main class="wrap">
     <section class="hero">
@@ -38,7 +19,7 @@
         <p>Share contracts, payroll and due diligence documents with people outside your company. Every file is encrypted, every open is logged, and access ends when you say so.</p>
         <div class="hero-actions">
           <a href="securevault.html" class="button-link">Explore SecureVault</a>
-          <a href="#" class="button-link secondary">View pricing</a>
+          <a href="pricing.html" class="button-link secondary">View pricing</a>
         </div>
       </div>
 
@@ -82,12 +63,8 @@
     </section>
   </main>
 
-  <footer class="site-footer">
-    <div class="wrap">
-      <p>© Acme Cloud. A fictional company, made up as the target of these tests.</p>
-      <p>Privacy · Terms · Security</p>
-    </div>
-  </footer>
+  <div id="site-footer"></div>
+  <script src="layout.js"></script>
 
   <div class="cookie-banner" role="dialog" aria-label="Cookies">
     <p>We use cookies to keep you signed in and to understand how the site is used.</p>
